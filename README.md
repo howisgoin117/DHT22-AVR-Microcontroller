@@ -1,1 +1,1 @@
-# DHT22-AVR-Microcontrollerl
+# DHT22-AVR-Microcontroller
