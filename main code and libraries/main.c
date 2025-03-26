@@ -1,14 +1,53 @@
+#define F_CPU 8000000UL  
+
+#include <util/delay.h>
 #include "DHT.h"
 #include "lcd_lib.h"
 #include <stdio.h>  
-#define F_CPU 8000000UL  
-#include <util/delay.h>
+
+#define RED_LED PD0  // Red LED on PORTB, pin 0
+#define GREEN_LED PD1 //pin 1
+#define	YELLOW_LED PD2 //pin 2
+
+
+
+void init_ports() {
+	// Set PB0,1,2 (LEDs) as output
+	DDRD |= (1 << RED_LED) | (1 << GREEN_LED) | (1 << YELLOW_LED);
+	// Initially turn off the LEDs
+	PORTD &= ~(1 << RED_LED) | (1 << GREEN_LED) | (1 << YELLOW_LED);
+	
+	
+}
+
+//Define controlled temp is between 24 and 26 C
+void control_led(double temp) {
+	if (temp < 24.0) {
+		PORTD |= (1 << RED_LED);   // Turn ON red LED
+		} else {
+		PORTD &= ~(1 << RED_LED);  // Turn OFF red LED
+	}
+	
+	if (temp >= 24.0 && temp <= 26.0) {
+		PORTD |= (1 << YELLOW_LED);   
+		} else {
+		PORTD &= ~(1 << YELLOW_LED);  
+	}
+	
+	if (temp > 26.0) {
+		PORTD |= (1 << GREEN_LED);
+		} else {
+		PORTD &= ~(1 << GREEN_LED);  
+	}
+	
+}
 
 int main(void)
 {
 
 	DDRC = 0xFF;
 	DDRB = 0xFF;
+	init_ports();        // LED pin setup
 	
 	// Initialize once before loop
 	LCD4_init();  // Initialize LCD
@@ -22,6 +61,9 @@ int main(void)
 		
 		// Read from sensor
 		DHT_Read(&temperature, &humidity);  // Pass addresses of scalars
+		
+		// Control LED based on temperature
+		control_led(temperature);
 		
 		LCD4_gotoxy(1, 1);  // Row 1, Column 1
 		LCD4_write_string("Temperature:");
