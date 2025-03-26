@@ -10,10 +10,9 @@ Attention:
 
 ->possible culprit may be: "Your compiler’s sprintf() implementation might not support floating-point formatting (%.1f) due to a minimal libc configuration (common in embedded systems like AVR-GCC to save space)."
 
-
+-LEDs depend on Temp range have been updated.
 
 Incoming features: 
-+ UART 
-+ LEDs based on temperature
++ UART to display on Hyperterminal
 
 Work in progress...
