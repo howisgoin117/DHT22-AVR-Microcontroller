@@ -2,7 +2,7 @@
 
 Attention:
 
--The file includes both DHT library and 16x2 LCD library
+-The file includes both the DHT library and 16x2 LCD library
 
 -So apparently there is a bug with sprintf displaying float values, it will print out garbage values on lcd screen. (fixed)
 
@@ -12,8 +12,8 @@ Attention:
 
 ->Displaying floating-values issues can be fixed by tweaking some settings inside the AVR-GCC compiler (Mine is Atmel Studio 7) - Illustrated in Figure 1 and 2
 
--LEDs depend on Temp range have been updated.
+-LEDs controlled by the temperature range have been updated.
 
-- UART to display on Hyperterminal (Updated)
+-UART to display on Hyperterminal (Updated)
 
 1st/Aprl/2025
