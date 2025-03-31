@@ -1,0 +1,120 @@
+#define F_CPU 1000000UL
+
+#include <util/delay.h>
+#include "DHT.h"
+#include "lcd_lib.h"
+#include <stdio.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#define RED_LED PD3    // Red LED on PORTD, pin 3
+#define GREEN_LED PD4  // pin 4
+#define YELLOW_LED PD5 // pin 5
+
+
+//#define USART_BAUDRATE 9600
+#define BAUD_PRESCALE (((F_CPU / (USART_BAUDRATE * 16UL))) - 1)
+
+
+void UART_init(long USART_BAUDRATE)
+{
+	UCSRB |= (1 << RXEN) | (1 << TXEN);/* Turn on transmission and reception */
+	UCSRC |= (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1);/* Use 8-bit character sizes */
+	UBRRL = BAUD_PRESCALE;		/* Load lower 8-bits of the baud rate value */
+	UBRRH = (BAUD_PRESCALE >> 8);	/* Load upper 8-bits*/
+}
+
+unsigned char UART_RxChar()
+{
+	while ((UCSRA & (1 << RXC)) == 0);/* Wait till data is received */
+	return(UDR);			/* Return the byte*/
+}
+
+void UART_TxChar(char ch)
+{
+	while (! (UCSRA & (1<<UDRE)));	/* Wait for empty transmit buffer*/
+	UDR = ch ;
+}
+
+void UART_SendString(char *str)
+{
+	unsigned char j=0;
+	
+	while (str[j]!=0)		/* Send string till null */
+	{
+		UART_TxChar(str[j]);
+		j++;
+	}
+}
+
+
+void init_ports() {
+	DDRD |= (1 << RED_LED) | (1 << GREEN_LED) | (1 << YELLOW_LED);
+	PORTD &= ~((1 << RED_LED) | (1 << GREEN_LED) | (1 << YELLOW_LED));
+}
+
+void control_led(double temp) {
+	if (temp < 24.0) {
+		PORTD |= (1 << RED_LED);
+		} else {
+		PORTD &= ~(1 << RED_LED);
+	}
+	if (temp >= 24.0 && temp <= 26.0) {
+		PORTD |= (1 << YELLOW_LED);
+		} else {
+		PORTD &= ~(1 << YELLOW_LED);
+	}
+	if (temp > 26.0) {
+		PORTD |= (1 << GREEN_LED);
+		} else {
+		PORTD &= ~(1 << GREEN_LED);
+	}
+}
+
+int main(void) {
+	DDRC = 0xFF;
+	DDRB = 0xFF;
+	init_ports();
+	LCD4_init();
+	DHT_Setup();
+	UART_init(9600);
+	
+	while (1) {
+		char buffer[32];
+		double temperature;
+		double humidity;
+		
+		DHT_Read(&temperature, &humidity);
+		control_led(temperature);
+		
+		LCD4_gotoxy(1, 1);
+		LCD4_write_string("Temperature:");
+		LCD4_gotoxy(2, 1);
+
+		switch (DHT_GetStatus()) {
+			case DHT_Ok:
+			sprintf(buffer, "%d C", (int)(temperature * 10));
+			LCD4_write_string((unsigned char*)buffer);	
+			UART_SendString("\n\t Temp: ");
+			break;
+			case DHT_Error_Checksum:
+			LCD4_write_string("C Error");
+			UART_SendString("Checksum Error\r\n");
+			break;
+			case DHT_Error_Timeout:
+			LCD4_write_string("T Error");
+			UART_SendString("Timeout Error\r\n");
+			break;
+			case DHT_Error_Temperature:
+			LCD4_write_string("TR Error");
+			UART_SendString("Temperature Read Error\r\n");
+			break;
+			default:
+			LCD4_write_string("Unknown Err");
+			UART_SendString("Unknown Error\r\n");
+			break;
+		}
+		_delay_ms(2000);
+	}
+	return 0;
+}
