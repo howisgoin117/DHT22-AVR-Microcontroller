@@ -66,7 +66,7 @@ enum DHT_Status_t DHT_ReadRaw(uint8_t Data[4])
 			retries += 2;
 			if (retries > 60)
 			{
-				__DHT_STATUS = DHT_Error_Timeout;	//Timeout error
+				__DHT_STATUS = DHT_Error_Timeout1;	//Timeout error
 				break;
 			}
 		}
@@ -85,7 +85,7 @@ enum DHT_Status_t DHT_ReadRaw(uint8_t Data[4])
 			retries += 2;
 			if (retries > 100)
 			{
-				__DHT_STATUS = DHT_Error_Timeout;	//Timeout error
+				__DHT_STATUS = DHT_Error_Timeout2;	//Timeout error
 				break;
 			}
 		}
@@ -97,7 +97,7 @@ enum DHT_Status_t DHT_ReadRaw(uint8_t Data[4])
 			retries += 2;
 			if (retries > 100)
 			{
-				__DHT_STATUS = DHT_Error_Timeout;	//Timeout error
+				__DHT_STATUS = DHT_Error_Timeout2;	//Timeout error
 				break;
 			}
 		}
@@ -119,7 +119,7 @@ enum DHT_Status_t DHT_ReadRaw(uint8_t Data[4])
 					retries += 2;
 					if (retries > 70)
 					{
-						__DHT_STATUS = DHT_Error_Timeout;	//Timeout error
+						__DHT_STATUS = DHT_Error_Timeout3;	//Timeout error
 						j = -1;								//Break inner for-loop
 						i = 5;								//Break outer for-loop
 						break;								//Break while loop
@@ -140,7 +140,7 @@ enum DHT_Status_t DHT_ReadRaw(uint8_t Data[4])
 						retries += 2;
 						if (retries > 100)
 						{
-							__DHT_STATUS = DHT_Error_Timeout;	//Timeout error
+							__DHT_STATUS = DHT_Error_Timeout3;	//Timeout error
 							break;
 						}
 					}
